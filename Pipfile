@@ -1,0 +1,16 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pyinstaller = "*"
+
+[packages]
+requests = {extras = ["security"],version = "*"}
+zeep = {extras = ["xmlsec"],version = "*"}
+wxpython = "*"
+keyring = "*"
+
+[requires]
+python_version = "3.7"
