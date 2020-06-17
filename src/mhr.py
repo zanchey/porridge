@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import sys, os
+import sys, os, os.path
 import requests
 from OpenSSL.crypto import load_pkcs12, X509, Error
 from urllib3 import PoolManager
@@ -155,7 +155,7 @@ class MyHealthRecordInterface:
         self.log.info("Loading SOAP interface...")
 
         self._getAuditView_client = zeep.Client(
-            "pcehr_schema/wsdl/External/B2B_GetAuditView.wsdl",
+            os.path.join(config["schema_path"], "wsdl/External/B2B_GetAuditView.wsdl"),
             transport=transport,
             wsse=wss_mhr,
             plugins=[WsaAnonymisePlugin(),],

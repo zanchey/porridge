@@ -23,12 +23,12 @@ esac
 
 case "$BUILD_OS" in
     windows*)
-        pyinstaller --name mhroat --windowed "${COMMON_FLAGS[@]}" --hidden-import 'keyring.backends.Windows' --add-data 'mhroat.xrc;.' $SOURCE
-        pyinstaller --name mhroatc --console "${COMMON_FLAGS[@]}" --hidden-import 'keyring.backends.Windows' --add-data 'mhroat.xrc;.' $SOURCE
+        pyinstaller --name mhroat --windowed "${COMMON_FLAGS[@]}" --hidden-import 'keyring.backends.Windows' --add-data 'resources;resources' $SOURCE
+        pyinstaller --name mhroatc --console "${COMMON_FLAGS[@]}" --hidden-import 'keyring.backends.Windows' --add-data 'resources;resources' $SOURCE
         ;;
 
     macos*)
-        pyinstaller --name MHROAT --windowed "${COMMON_FLAGS[@]}" --hidden-import 'keyring.backends.OS_X' --add-data 'mhroat.xrc:.' $SOURCE
+        pyinstaller --name MHROAT --windowed "${COMMON_FLAGS[@]}" --hidden-import 'keyring.backends.OS_X' --add-data 'resources:resources' $SOURCE
         pushd dist
         zip -rm MHROAT.app.zip MHROAT.app
         rm MHROAT # Single executable not useful as it can't start the GUI
@@ -36,7 +36,7 @@ case "$BUILD_OS" in
         ;;
 
     ubuntu*)
-        pyinstaller --name mhroat --windowed "${COMMON_FLAGS[@]}" --hidden-import 'keyring.backends.SecretService' --add-data 'mhroat.xrc:.' $SOURCE
+        pyinstaller --name mhroat --windowed "${COMMON_FLAGS[@]}" --hidden-import 'keyring.backends.SecretService' --add-data 'resources:resources' $SOURCE
         ;;
 
     *)

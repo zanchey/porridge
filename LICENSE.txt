@@ -4,7 +4,7 @@ Copyright © 2020 David Adam <mail@davidadam.com.au>
 Licensed under the GNU General Public License Version 3 or later; see below.
 
 Contains code licensed under the Apache 2.0 License: see
-pcehr_schema/license.txt.
+resources/pcehr_schema/license.txt.
 
 ----
 

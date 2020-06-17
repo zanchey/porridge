@@ -46,6 +46,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+if hasattr(sys, "_MEIPASS"):
+    res_path = path.join(sys._MEIPASS, "resources")
+else:
+    res_path = path.join(path.abspath(path.curdir), "resources")
+
+mhr_config["schema_path"] = path.join(res_path, "pcehr_schema")
+
 GETAUDITVIEW_HEADERS = (
     "businessEvent",
     "eventTimeStamp",
@@ -104,10 +111,7 @@ def wx_to_pydate(wxdate):
 # GUI
 class PorridgeApp(wx.App):
     def OnInit(self):
-        res_file = "mhroat.xrc"
-        if hasattr(sys, "_MEIPASS"):
-            res_file = path.join(sys._MEIPASS, res_file)
-        self.res = xrc.XmlResource(res_file)
+        self.res = xrc.XmlResource(path.join(res_path, "mhroat.xrc"))
 
         self.args_window = self.res.LoadFrame(None, "winArgs")
         xrc.XRCCTRL(self.args_window, "m_startDate").SetValue(
@@ -272,9 +276,9 @@ def cli_app():
     )
     parser.add_argument(
         "--time-from",
-        type=lambda s: datetime.strptime(s, '%H:%M'),
+        type=lambda s: datetime.strptime(s, "%H:%M"),
         default=None,
-        help="Audit start time (HH:MM, 24-hour format)"
+        help="Audit start time (HH:MM, 24-hour format)",
     )
     parser.add_argument(
         "-t",
@@ -285,9 +289,9 @@ def cli_app():
     )
     parser.add_argument(
         "--time-to",
-        type=lambda s: datetime.strptime(s, '%H:%M'),
+        type=lambda s: datetime.strptime(s, "%H:%M"),
         default=None,
-        help="Audit end time (HH:MM, 24-hour format)"
+        help="Audit end time (HH:MM, 24-hour format)",
     )
     parser.add_argument("-o", "--output-file", required=True)
     args = parser.parse_args()
