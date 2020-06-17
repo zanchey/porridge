@@ -389,6 +389,9 @@ def run(output_socket, cert_file, cert_pass, date_from, date_to, output_file):
     except Exception as e:
         logging.exception("Unhandled exception", exc_info=e)
 
+    finally:
+        output_socket.close()
+
 
 def main():
     multiprocessing.freeze_support()

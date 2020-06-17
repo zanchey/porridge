@@ -27,6 +27,7 @@ from datetime import datetime, timezone
 import logging
 
 
+
 class HTTPSAdapterWithContext(requests.adapters.HTTPAdapter):
     """Transport adapter with custom SSL context"""
 
