@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+
+  build:
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        if test ${{ matrix.os }} = macos-latest; then
+          brew install libxmlsec1 pkg-config
+        fi
+        python -m pip install --upgrade pip
+        python -m pip install pipenv
+        pipenv update -d
+
+    - name: Build
+      env:
+        SECRET_ZIP_PASS: ${{ secrets.SECRET_ZIP_PASS }}
+        BUILD_TYPE: test
+        BUILD_OS: ${{ matrix.os }}
+      run: pipenv run bash build.sh
+
+    - name: Test
+      run: pipenv run bash tests/test_NOC.sh
+
+    - name: Upload builds
+      uses: actions/upload-artifact@v2
+      with:
+        name: mhroat-${{ matrix.os }}-${{ github.sha }}
+        path: dist/*
+
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
