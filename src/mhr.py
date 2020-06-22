@@ -15,9 +15,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import sys, os, os.path
-import requests
+import requests, urllib3
 from OpenSSL.crypto import load_pkcs12, X509, Error
-from urllib3 import PoolManager
+import urllib3.contrib.pyopenssl
 from urllib3.util.ssl_ import create_urllib3_context
 import zeep, zeep.plugins
 import xmlsec
@@ -26,6 +26,8 @@ from nehta_signature import NehtaXMLSignature
 from datetime import datetime, timezone
 import logging
 
+# Required to make urllib use PyOpenSSL, which supports PKCS#12 handling
+urllib3.contrib.pyopenssl.inject_into_urllib3()
 
 
 class HTTPSAdapterWithContext(requests.adapters.HTTPAdapter):
@@ -37,7 +39,7 @@ class HTTPSAdapterWithContext(requests.adapters.HTTPAdapter):
         super().__init__(*args, **kwargs)
 
     def init_poolmanager(self, connections, maxsize, block=False):
-        self.poolmanager = PoolManager(
+        self.poolmanager = urllib3.PoolManager(
             num_pools=connections,
             maxsize=maxsize,
             block=block,

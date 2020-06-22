@@ -46,8 +46,11 @@ cert_xmlsec = xmlsec.Key.from_memory(
 
 hpio, orgname = mhr.hpio_from_certificate(cert_os)
 
+import urllib3
 from urllib3 import PoolManager
 from urllib3.util.ssl_ import create_urllib3_context
+
+urllib3.contrib.pyopenssl.inject_into_urllib3()
 
 ctx = create_urllib3_context()
 ctx.set_default_verify_paths()
