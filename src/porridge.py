@@ -227,12 +227,13 @@ class PorridgeApp(wx.App):
 
     def Update(self, event):
         if not self.progress_window.process._closed:
-            if self.progress_window.pipe.poll():
-                try:
+            try:
+                if self.progress_window.pipe.poll():
                     mytext = self.progress_window.pipe.recv() + "\n"
                     self.progress_window.text_out.AppendText(mytext)
-                except EOFError:
-                    self.Done(None)
+            # poll() can raise BrokenPipeError on Windows, see https://bugs.python.org/issue41008
+            except (EOFError, BrokenPipeError):
+                self.Done(None)
         return True
 
     def Stop(self, event):
