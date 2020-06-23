@@ -246,6 +246,7 @@ class PorridgeApp(wx.App):
         self.progress_window.process.close()
         self.progress_window.b_cancel.Hide()
         self.progress_window.b_ok.Show()
+        self.progress_window.b_ok.GetParent().Layout()
         return True
 
     def ShowAbout(self, event):
