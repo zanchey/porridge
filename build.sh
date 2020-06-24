@@ -5,7 +5,7 @@ set -eo pipefail
 test ! -d secret -a -n "$SECRET_ZIP_PASS" && 7z -P"$SECRET_ZIP_PASS" x secret.7z
 
 SOURCE=src/porridge.py
-COMMON_FLAGS=(--onefile --hidden-import pkg_resources.py2_warn)
+COMMON_FLAGS=(--onefile --hidden-import pkg_resources.py2_warn --additional-hooks-dir=pyinstaller-hooks)
 
 case "$BUILD_TYPE" in
     test)
@@ -23,12 +23,12 @@ esac
 
 case "$BUILD_OS" in
     windows*)
-        pyinstaller --name mhroat --windowed "${COMMON_FLAGS[@]}" --hidden-import 'keyring.backends.Windows' --add-data 'resources;resources' $SOURCE
-        pyinstaller --name mhroatc --console "${COMMON_FLAGS[@]}" --hidden-import 'keyring.backends.Windows' --add-data 'resources;resources' $SOURCE
+        pyinstaller --name mhroat --windowed "${COMMON_FLAGS[@]}" --add-data 'resources;resources' $SOURCE
+        pyinstaller --name mhroatc --console "${COMMON_FLAGS[@]}" --add-data 'resources;resources' $SOURCE
         ;;
 
     macos*)
-        pyinstaller --name MHROAT --windowed "${COMMON_FLAGS[@]}" --hidden-import 'keyring.backends.OS_X' --add-data 'resources:resources' $SOURCE
+        pyinstaller --name MHROAT --windowed "${COMMON_FLAGS[@]}" --add-data 'resources:resources' $SOURCE
         pushd dist
         zip -rm MHROAT.app.zip MHROAT.app
         rm MHROAT # Single executable not useful as it can't start the GUI
@@ -36,7 +36,7 @@ case "$BUILD_OS" in
         ;;
 
     ubuntu*)
-        pyinstaller --name mhroat --windowed "${COMMON_FLAGS[@]}" --hidden-import 'keyring.backends.SecretService' --add-data 'resources:resources' $SOURCE
+        pyinstaller --name mhroat --windowed "${COMMON_FLAGS[@]}" --add-data 'resources:resources' $SOURCE
         ;;
 
     *)
