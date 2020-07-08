@@ -28,7 +28,7 @@ case "$BUILD_OS" in
         ;;
 
     macos*)
-        pyinstaller --name MHROAT --windowed "${COMMON_FLAGS[@]}" --add-data 'resources:resources' $SOURCE
+        pyinstaller --name MHROAT --windowed "${COMMON_FLAGS[@]}" --icon resources/mhroat.icns --add-data 'resources:resources' $SOURCE
         pushd dist
         zip -rm MHROAT.app.zip MHROAT.app
         rm MHROAT # Single executable not useful as it can't start the GUI
