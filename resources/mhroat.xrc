@@ -191,16 +191,32 @@
 		<object class="wxBoxSizer">
 			<orient>wxVERTICAL</orient>
 			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
+				<option>1</option>
+				<flag>wxEXPAND</flag>
 				<border>5</border>
-				<object class="wxStaticText" name="m_abouttext">
-					<label>About Text</label>
-					<wrap>-1</wrap>
+				<object class="wxBoxSizer">
+					<orient>wxHORIZONTAL</orient>
+					<object class="sizeritem">
+						<option>0</option>
+						<flag>wxALL</flag>
+						<border>5</border>
+						<object class="wxStaticText" name="m_abouttext">
+							<label>About Text</label>
+							<wrap>-1</wrap>
+						</object>
+					</object>
+					<object class="sizeritem">
+						<option>0</option>
+						<flag>wxALL</flag>
+						<border>20</border>
+						<object class="wxStaticBitmap" name="m_logo">
+							<bitmap />
+						</object>
+					</object>
 				</object>
 			</object>
 			<object class="sizeritem">
-				<option>1</option>
+				<option>0</option>
 				<flag>wxEXPAND</flag>
 				<border>5</border>
 				<object class="wxStdDialogButtonSizer">

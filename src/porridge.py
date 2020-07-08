@@ -31,6 +31,7 @@ from config import mhr_config
 ABOUT_TEXT = """My Health Record Organisational Audit Tool (Porridge)
 Version 1.0
 Copyright © 2020 David Adam <mail@davidadam.com.au>
+Icon by Melannie Lai <melannielai@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -134,6 +135,15 @@ class PorridgeApp(wx.App):
         # About
         self.about_dialog = self.res.LoadDialog(self.args_window, "winAbout")
         xrc.XRCCTRL(self.about_dialog, "m_abouttext").SetLabelText(ABOUT_TEXT)
+        # wxPython on macOS doesn't support Windows bitmaps with transparency; manifests as "Error in reading image DIB"
+        # Loading PNG on Windows adds ~10 MB to the executable, so only use it if it's available
+        if wx.Image.FindHandler(wx.BITMAP_TYPE_PNG):
+            about_image = "mhroat.png"
+        else:
+            about_image = "mhroat.bmp"
+        xrc.XRCCTRL(self.about_dialog, "m_logo").Bitmap = wx.Bitmap(
+            path.join(res_path, about_image)
+        )
         self.about_dialog.Fit()
 
         # Process window
