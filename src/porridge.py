@@ -114,7 +114,12 @@ class PorridgeApp(wx.App):
     def OnInit(self):
         self.res = xrc.XmlResource(path.join(res_path, "mhroat.xrc"))
 
+        self.icon = None
+        if wx.Image.FindHandler(wx.BITMAP_TYPE_ICO):
+            self.icon = wx.Icon(path.join(res_path, "mhroat.ico"))
+
         self.args_window = self.res.LoadFrame(None, "winArgs")
+        self.args_window.Icon = self.icon
         xrc.XRCCTRL(self.args_window, "m_startDate").SetValue(
             wx.DateTime.Now().SetDay(1)
         )
@@ -134,6 +139,7 @@ class PorridgeApp(wx.App):
 
         # About
         self.about_dialog = self.res.LoadDialog(self.args_window, "winAbout")
+        self.about_dialog.Icon = self.icon
         xrc.XRCCTRL(self.about_dialog, "m_abouttext").SetLabelText(ABOUT_TEXT)
         # wxPython on macOS doesn't support Windows bitmaps with transparency; manifests as "Error in reading image DIB"
         # Loading PNG on Windows adds ~10 MB to the executable, so only use it if it's available
@@ -202,6 +208,7 @@ class PorridgeApp(wx.App):
 
         # Load the progress dialog
         self.progress_window = self.res.LoadDialog(self.args_window, "winProgress")
+        self.progress_window.icon = self.icon
         self.progress_window.text_out = xrc.XRCCTRL(self.progress_window, "m_textOut")
         self.progress_window.b_cancel = xrc.XRCCTRL(self.progress_window, "wxID_CANCEL")
         self.progress_window.b_ok = xrc.XRCCTRL(self.progress_window, "wxID_OK")

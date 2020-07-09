@@ -23,7 +23,7 @@ esac
 
 case "$BUILD_OS" in
     windows*)
-        pyinstaller --name mhroat --windowed "${COMMON_FLAGS[@]}" --add-data 'resources;resources' $SOURCE
+        pyinstaller --name mhroat --windowed "${COMMON_FLAGS[@]}" --icon resources/mhroat.ico --add-data 'resources;resources' $SOURCE
         pyinstaller --name mhroatc --console "${COMMON_FLAGS[@]}" --add-data 'resources;resources' $SOURCE
         ;;
 
