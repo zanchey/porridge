@@ -5,7 +5,7 @@ set -eo pipefail
 test ! -d secret -a -n "$SECRET_ZIP_PASS" && 7z -P"$SECRET_ZIP_PASS" x secret.7z
 
 SOURCE=src/porridge.py
-COMMON_FLAGS=(--onefile --hidden-import pkg_resources.py2_warn --additional-hooks-dir=pyinstaller-hooks)
+COMMON_FLAGS=(--onefile --hidden-import pkg_resources.py2_warn --additional-hooks-dir=pyinstaller-hooks --exclude-module numpy)
 
 case "$BUILD_TYPE" in
     test)
