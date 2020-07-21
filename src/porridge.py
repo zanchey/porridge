@@ -279,7 +279,9 @@ def cli_app():
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--cert-file", help="Certificate file", required=True)
+    parser.add_argument(
+        "-c", "--cert-file", help="Certificate file (required)", required=True
+    )
     parser.add_argument(
         "-P",
         "--prompt-password",
@@ -294,28 +296,30 @@ def cli_app():
         "--date-from",
         type=date.fromisoformat,
         default=date.today().replace(day=1),
-        help="Audit start date (YYYY-MM-DD)",
+        help="Audit start date (YYYY-MM-DD) - defaults to first day of this month",
     )
     parser.add_argument(
         "--time-from",
         type=lambda s: datetime.strptime(s, "%H:%M"),
         default=None,
-        help="Audit start time (HH:MM, 24-hour format)",
+        help="Audit start time (HH:MM, 24-hour format) - defaults to midnight",
     )
     parser.add_argument(
         "-t",
         "--date-to",
         type=date.fromisoformat,
         default=date.today(),
-        help="Audit end date (YYYY-MM-DD)",
+        help="Audit end date (YYYY-MM-DD) - defaults to today",
     )
     parser.add_argument(
         "--time-to",
         type=lambda s: datetime.strptime(s, "%H:%M"),
         default=None,
-        help="Audit end time (HH:MM, 24-hour format)",
+        help="Audit end time (HH:MM, 24-hour format) - defaults to midnight",
     )
-    parser.add_argument("-o", "--output-file", required=True)
+    parser.add_argument(
+        "-o", "--output-file", required=True, help="Output CSV file (required)"
+    )
     args = parser.parse_args()
 
     datetime_from = args.date_from
