@@ -10,14 +10,14 @@
 			<object class="sizeritem">
 				<option>1</option>
 				<flag>wxEXPAND | wxALL</flag>
-				<border>5</border>
+				<border>0</border>
 				<object class="wxPanel" name="m_panel1">
 					<style>wxTAB_TRAVERSAL</style>
 					<object class="wxBoxSizer">
 						<orient>wxVERTICAL</orient>
 						<object class="sizeritem">
 							<option>2</option>
-							<flag>wxEXPAND</flag>
+							<flag>wxALL|wxEXPAND</flag>
 							<border>5</border>
 							<object class="wxStaticBoxSizer">
 								<orient>wxVERTICAL</orient>
@@ -73,7 +73,7 @@
 						</object>
 						<object class="sizeritem">
 							<option>1</option>
-							<flag>wxEXPAND</flag>
+							<flag>wxALL|wxEXPAND</flag>
 							<border>5</border>
 							<object class="wxStaticBoxSizer">
 								<orient>wxHORIZONTAL</orient>
@@ -132,7 +132,7 @@
 						</object>
 						<object class="sizeritem">
 							<option>1</option>
-							<flag>wxEXPAND</flag>
+							<flag>wxALL|wxEXPAND</flag>
 							<border>5</border>
 							<object class="wxStaticBoxSizer">
 								<orient>wxVERTICAL</orient>
@@ -152,7 +152,7 @@
 						</object>
 						<object class="sizeritem">
 							<option>0</option>
-							<flag>wxEXPAND</flag>
+							<flag>wxALL|wxEXPAND</flag>
 							<border>5</border>
 							<object class="wxBoxSizer">
 								<orient>wxHORIZONTAL</orient>
