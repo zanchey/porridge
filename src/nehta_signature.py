@@ -39,6 +39,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from lxml import etree
 from lxml.etree import QName
 from lxml.builder import ElementMaker
 
@@ -50,6 +51,7 @@ from zeep.wsdl.utils import get_or_create_header
 from zeep.wsse.signature import _make_sign_key, _make_verify_key
 
 import xmlsec
+import os
 
 NSMAP = {
     "h": "http://ns.electronichealth.net.au/pcehr/xsd/common/CommonCoreElements/1.0",
@@ -84,14 +86,28 @@ class NehtaXMLSignature(object):
             raise TypeError("key not an instance of xmlsec.Key")
         self.key = key
 
+        # For debugging/NOC validation use
+        # Done here rather than as a Zeep plugin as plugins are run before WSSE, so the
+        # plugin only ever sees the unsigned version
+        if "MHR_LOG" in os.environ:
+            self.egress_file = open(os.environ["MHR_LOG"] + "-request.xml", "wb")
+            self.ingress_file = open(os.environ["MHR_LOG"] + "-response.xml", "wb")
+        else:
+            self.egress_file = None
+            self.ingress_file = None
+
     def apply(self, envelope, headers):
         _sign_envelope_with_key(envelope, self.key)
+        if self.egress_file:
+            self.egress_file.write(etree.tostring(envelope, pretty_print=True))
         return envelope, headers
 
     def verify(self, envelope):
         # Don't verify the envelope for now; it is not required by the standards,
         # the whole exchange is protected by TLS anyway, and there is no way of
         # confirming the assertion of identity.
+        if self.ingress_file:
+            self.ingress_file.write(etree.tostring(envelope, pretty_print=True))
         return envelope
 
         _verify_envelope_with_key(envelope, self.key)

@@ -21,7 +21,6 @@ import urllib3.contrib.pyopenssl
 from urllib3.util.ssl_ import create_urllib3_context
 import zeep, zeep.plugins
 import xmlsec
-from lxml import etree
 from nehta_signature import NehtaXMLSignature
 from datetime import datetime, timezone
 import logging
