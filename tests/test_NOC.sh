@@ -17,27 +17,31 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+if [ -z ${NOC_TEST_DIR+x} ]; then
+    echo "Run with a fully-qualified path in the NOC_TEST_DIR environment variable to log all requests & responses."
+fi
+
 set -xeu
 OUTDIR=`mktemp -d`
 
 export PYTHONPATH=src:${PYTHONPATH:-}
 
 # getAuditView Test 10 - Provide a working period that has a few audit records
-python src/porridge.py -P -S --cert-file=secret/test-fac_sign.p12 -o "$OUTDIR/good.csv" --date-from 2016-05-01 --date-to 2020-05-01 < secret/test-password.txt
+${NOC_TEST_DIR+env MHR_LOG=${NOC_TEST_DIR}/noc_test_10} python src/porridge.py -P -S --cert-file=secret/test-fac_sign.p12 -o "$OUTDIR/good.csv" --date-from 2016-05-01 --date-to 2020-05-01 < secret/test-password.txt
 grep -F --quiet 'getAuditView,2018-09-20 19:54:22.732000+10:00,,,,8003624900029833,Test Health Service 473,8003624900029833,Test Health Service 473,,Medicare,Self,8003608000179507,,IHI,8003608000179507,Create,Register for a Record,,,,,,,,,,'  "$OUTDIR/good.csv"
 
 # getAuditView Test 11 - no dates
 # Not done via the UI, which will pick default values
-python tests/noc_test_11.py 2>&1 | grep -F --quiet "Request failed: PCEHR_ERROR_0003 - SOAP body fault"
+${NOC_TEST_DIR+env MHR_LOG=${NOC_TEST_DIR}/noc_test_11} python tests/noc_test_11.py 2>&1 | grep -F --quiet "Request failed: PCEHR_ERROR_0003 - SOAP body fault"
 
 # getAuditView Test 12 - provide a working period that has more than 500 audit records
 # This period needs to be set up with the tests/send_requests.py tool for the right period
-python src/porridge.py -P -S --cert-file=secret/test-fac_sign.p12 -o "$OUTDIR/fail.csv" --date-from 2020-05-20 --date-to 2020-05-23 < secret/test-password.txt
+${NOC_TEST_DIR+env MHR_LOG=${NOC_TEST_DIR}/noc_test_12} python src/porridge.py -P -S --cert-file=secret/test-fac_sign.p12 -o "$OUTDIR/fail.csv" --date-from 2020-05-20 --date-to 2020-05-23 < secret/test-password.txt
 test ! -f "$OUTDIR/fail.csv"
 
 # getAuditView Test 13 - Invalid HPIO and Time period
 # Not done via the UI, which will always use the right HPIO from the certificate
-python tests/noc_test_13.py 2>&1 | grep -F --quiet "Request failed: PCEHR_ERROR_0505 - Invalid HPI-O"
+${NOC_TEST_DIR+env MHR_LOG=${NOC_TEST_DIR}/noc_test_13} python tests/noc_test_13.py 2>&1 | grep -F --quiet "Request failed: PCEHR_ERROR_0505 - Invalid HPI-O"
 
 # Clean up
 rm -r "$OUTDIR"
