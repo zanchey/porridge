@@ -123,10 +123,16 @@ class MyHealthRecordInterface:
                 )
                 raise CertificateLoadException
 
+        # SHA-1 certificates just come with a certificate and a private key
+        # SHA-256 certificates come with a whole chain
+        # xmlsec puts all the information about the chain into the signature but this is
+        # not permitted by ATS 5821-2010, so wipe the chain and re-encode it before turning it into
+        # an xmlsec object
         cert_os = pkcs_os.get_certificate()
         pkey_os = pkcs_os.get_privatekey()
+        pkcs_os.set_ca_certificates(None)
         cert_xmlsec = xmlsec.Key.from_memory(
-            pkcs12_bytes, xmlsec.KeyFormat.PKCS12_PEM, cert_password
+            pkcs_os.export(passphrase=None), xmlsec.KeyFormat.PKCS12_PEM, password=None
         )
 
         self.hpio, self.orgname = hpio_from_certificate(cert_os)
