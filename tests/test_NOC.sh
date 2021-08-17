@@ -27,7 +27,7 @@ OUTDIR=`mktemp -d`
 export PYTHONPATH=src:${PYTHONPATH:-}
 
 # getAuditView Test 10 - Provide a working period that has a few audit records
-${NOC_TEST_DIR+env MHR_LOG=${NOC_TEST_DIR}/noc_test_10} python src/porridge.py -P -S --cert-file=secret/test-fac_sign.p12 -o "$OUTDIR/good.csv" --date-from 2016-05-01 --date-to 2020-05-01 < secret/test-password.txt
+${NOC_TEST_DIR+env MHR_LOG=${NOC_TEST_DIR}/noc_test_10} python src/porridge.py -P -S --cert-file=secret/test-fac_sign.p12 -o "$OUTDIR/good.csv" --date-from 2018-09-01 --date-to 2018-10-01 < secret/test-password.txt
 grep -F --quiet 'getAuditView,2018-09-20 19:54:22.732000+10:00,,,,8003624900029833,Test Health Service 473,8003624900029833,Test Health Service 473,,Medicare,Self,8003608000179507,,IHI,8003608000179507,Create,Register for a Record,,,,,,,,,,'  "$OUTDIR/good.csv"
 
 # getAuditView Test 11 - no dates
