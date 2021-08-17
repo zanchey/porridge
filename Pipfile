@@ -11,6 +11,7 @@ requests = {extras = ["security"],version = "*"}
 zeep = {extras = ["xmlsec"],version = "*"}
 wxpython = "*"
 keyring = "*"
+pyopenssl = "*"
 
 [requires]
 python_version = "3.7"
