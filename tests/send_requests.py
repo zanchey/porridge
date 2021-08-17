@@ -40,8 +40,9 @@ pkcs_os = load_pkcs12(pkcs12_bytes, cert_password.encode("utf-8"))
 
 cert_os = pkcs_os.get_certificate()
 pkey_os = pkcs_os.get_privatekey()
+pkcs_os.set_ca_certificates(None)
 cert_xmlsec = xmlsec.Key.from_memory(
-    pkcs12_bytes, xmlsec.KeyFormat.PKCS12_PEM, cert_password
+    pkcs_os.export(passphrase=None), xmlsec.KeyFormat.PKCS12_PEM, password=None
 )
 
 hpio, orgname = mhr.hpio_from_certificate(cert_os)
