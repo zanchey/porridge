@@ -29,7 +29,7 @@ from datetime import datetime, date, time
 from config import mhr_config
 
 ABOUT_TEXT = """My Health Record Organisational Audit Tool (Porridge)
-Version 1.0
+Version 1.1
 Copyright © 2020 David Adam <mail@davidadam.com.au>
 Icon by Melannie Lai <melannielai@gmail.com>
 
