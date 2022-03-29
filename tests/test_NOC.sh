@@ -28,7 +28,7 @@ export PYTHONPATH=src:${PYTHONPATH:-}
 
 # getAuditView Test 10 - Provide a working period that has a few audit records
 ${NOC_TEST_DIR+env MHR_LOG=${NOC_TEST_DIR}/noc_test_10} python src/porridge.py -P -S --cert-file=secret/test-fac_sign.p12 -o "$OUTDIR/good.csv" --date-from 2021-08-01 --date-to 2021-08-16 --time-to 23:40 < secret/test-password.txt
-grep -E --quiet 'getAuditView,2021-08-16 23:38:26\.327000\+10:00,,,,8003628233368719,Test Health Service 1045,8003628233368719,Test Health Service 1045,,david,External Provider,\d+,\w+,IHI,\d+,Update,Access Record,,,,,,,,,EmergencyAccess,'  "$OUTDIR/good.csv"
+grep -E --quiet 'getAuditView,2021-08-16 23:38:26\.327000\+10:00,,,,8003628233368719,Test Health Service 1045,8003628233368719,Test Health Service 1045,,david,External Provider,[[:digit:]]+,[[:alpha:]]+,IHI,[[:digit:]]+,Update,Access Record,,,,,,,,,EmergencyAccess,' "$OUTDIR/good.csv"
 
 # getAuditView Test 11 - no dates
 # Not done via the UI, which will pick default values
