@@ -32,7 +32,7 @@ grep -E --quiet 'getAuditView,2021-08-16 23:38:26\.327000\+10:00,,,,800362823336
 
 # getAuditView Test 11 - no dates
 # Not done via the UI, which will pick default values
-${NOC_TEST_DIR+env MHR_LOG=${NOC_TEST_DIR}/noc_test_11} python tests/noc_test_11.py 2>&1 | grep -F --quiet "Request failed: PCEHR_ERROR_0003 - SOAP body fault"
+${NOC_TEST_DIR+env MHR_LOG=${NOC_TEST_DIR}/noc_test_11} python tests/noc_test_11.py 2>&1 | grep -F --quiet "Request failed: PCEHR_ERROR_0510 - SOAP body fault"
 
 # getAuditView Test 12 - provide a working period that has more than 500 audit records
 # This period needs to be set up with the tests/send_requests.py tool for the right period
