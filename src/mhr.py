@@ -16,7 +16,10 @@
 
 import sys, os, os.path
 import requests, urllib3
-from OpenSSL.crypto import load_pkcs12, X509, Error
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.serialization import pkcs12
+import cryptography.x509
+from cryptography.x509 import ObjectIdentifier as oid
 import urllib3.contrib.pyopenssl
 from urllib3.util.ssl_ import create_urllib3_context
 import zeep, zeep.plugins
@@ -47,15 +50,15 @@ class HTTPSAdapterWithContext(requests.adapters.HTTPAdapter):
 
 
 def hpio_from_certificate(certificate):
-    if not isinstance(certificate, X509):
+    if not isinstance(certificate, cryptography.x509.Certificate):
         raise TypeError(
-            "Certificate must be of type OpenSSL.crypto.X509, not", type(certificate)
+            "Certificate must be of type cryptography.x509.Certificate, not", type(certificate)
         )
-    subj = certificate.get_subject().get_components()
+    subj = certificate.subject
     # HPIO is in the CN, which is formatted as general.<HPI-O>.id.electronichealth.net.au
     # per DHS policy 1.20.1.1 (Certificate Policy for the digital NASH PKI Certificate for Healthcare Provider Organisations)
-    hpio = [x[1].decode() for x in subj if x[0] == b"CN"][0].split(".")[1]
-    orgname = [x[1] for x in subj if x[0] == b"O"][0].decode("utf-8")
+    hpio = subj.get_attributes_for_oid(oid("2.5.4.3"))[0].value.split(".")[1] # 2.5.4.3 is commonName
+    orgname = subj.get_attributes_for_oid(oid("2.5.4.10"))[0].value # 2.5.4.10 is organizationName
     return hpio, orgname
 
 
@@ -110,44 +113,46 @@ class MyHealthRecordInterface:
         self.log.info("Loading certificate...")
         # Load the certificate
         # This is a bit of a mess at present as the certificate is required in two different formats:
-        # an OpenSSL.crypto.X509 object which can be used with OpenSSL security contexts, and
+        # an cryptography.X509 object which can be used with OpenSSL security contexts, and
         # an xmlsec.Key object.
-        # cryptography is getting support for pkcs12 loading, and requests for the X509 adapter.
         with open(cert_file, "rb") as f:
             pkcs12_bytes = f.read()
             try:
-                pkcs_os = load_pkcs12(pkcs12_bytes, cert_password.encode("utf-8"))
-            except Error as e:  # OpenSSL.crypto.Error
+                pkcs_cg = pkcs12.load_pkcs12(
+                    pkcs12_bytes, cert_password.encode("utf-8")
+                )
+            except ValueError as e:
                 self.log.error(
-                    "Could not load certificate; check the supplied password."
+                    "Could not load certificate; check the supplied password (ValueError: %s).", e
                 )
                 raise CertificateLoadException
 
-        # SHA-1 certificates just come with a certificate and a private key
-        # SHA-256 certificates come with a whole chain
-        # xmlsec puts all the information about the chain into the signature but this is
-        # not permitted by ATS 5821-2010, so wipe the chain and re-encode it before turning it into
-        # an xmlsec object
-        cert_os = pkcs_os.get_certificate()
-        pkey_os = pkcs_os.get_privatekey()
-        pkcs_os.set_ca_certificates(None)
+        cert_cg = pkcs_cg.cert.certificate
         cert_xmlsec = xmlsec.Key.from_memory(
-            pkcs_os.export(passphrase=None), xmlsec.KeyFormat.PKCS12_PEM, password=None
+            pkcs_cg.key.private_bytes(
+                serialization.Encoding.PEM,
+                serialization.PrivateFormat.PKCS8,
+                serialization.NoEncryption(),
+            ),
+            xmlsec.KeyFormat.PKCS8_PEM,
+            password=None,
         )
 
-        self.hpio, self.orgname = hpio_from_certificate(cert_os)
+        self.hpio, self.orgname = hpio_from_certificate(cert_cg)
         self.log.info("Got HPI-O %s for organisation %s.", self.hpio, self.orgname)
 
-        if parse_asn1_time(cert_os.get_notAfter()) < datetime.now():
+        if cert_cg.not_valid_after_utc < datetime.now(tz=timezone.utc):
             self.log.warn("Certificate appears to be expired.")
-        if parse_asn1_time(cert_os.get_notBefore()) > datetime.now():
+        if cert_cg.not_valid_before_utc > datetime.now(tz=timezone.utc):
             self.log.warn("Certificate does not appear to be valid yet.")
 
         # Create a PyOpenSSL context that can be used with requests with a client certificate
+        # The standard library's ssl module does not support loading from memory; the only real
+        # justification is that this is less secure - see https://github.com/python/cpython/issues/129216
         ctx = create_urllib3_context()
         ctx.set_default_verify_paths()
-        ctx._ctx.use_certificate(cert_os)
-        ctx._ctx.use_privatekey(pkey_os)
+        ctx._ctx.use_certificate(cert_cg)
+        ctx._ctx.use_privatekey(pkcs_cg.key)
 
         # Set up a requests session object that uses this context
         s = requests.sessions.Session()
