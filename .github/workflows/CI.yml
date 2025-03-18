@@ -27,8 +27,7 @@ jobs:
         fi
         python -m pip install --upgrade pip
         python -m pip install pipenv
-        pipenv lock
-        pipenv update -d
+        pipenv sync -d
 
     - name: Build
       env:
