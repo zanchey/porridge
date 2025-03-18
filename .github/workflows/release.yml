@@ -38,7 +38,7 @@ jobs:
     # Just upload as artifacts
     # The Releases action can't take wildcards and anyway it's worth adding the documentation
     - name: Upload builds
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: mhroat-${{ matrix.os }}-${{ github.sha }}
         path: dist/*

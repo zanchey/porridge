@@ -40,7 +40,7 @@ jobs:
       run: pipenv run bash tests/test_NOC.sh
 
     - name: Upload builds
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: mhroat-${{ matrix.os }}-${{ github.sha }}
         path: dist/*
