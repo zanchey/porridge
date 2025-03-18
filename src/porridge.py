@@ -91,7 +91,7 @@ GETAUDITVIEW_HEADERS = (
 
 def flatten_xsd(d, prefix=""):
     """Flattens a XSD tree into a sequence of key, value tuples.
-    
+
     Works best when wrapped in dict()."""
     for k in d:
         if isinstance(d[k], zeep.xsd.valueobjects.CompoundValue):

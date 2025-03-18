@@ -52,13 +52,18 @@ class HTTPSAdapterWithContext(requests.adapters.HTTPAdapter):
 def hpio_from_certificate(certificate):
     if not isinstance(certificate, cryptography.x509.Certificate):
         raise TypeError(
-            "Certificate must be of type cryptography.x509.Certificate, not", type(certificate)
+            "Certificate must be of type cryptography.x509.Certificate, not",
+            type(certificate),
         )
     subj = certificate.subject
     # HPIO is in the CN, which is formatted as general.<HPI-O>.id.electronichealth.net.au
     # per DHS policy 1.20.1.1 (Certificate Policy for the digital NASH PKI Certificate for Healthcare Provider Organisations)
-    hpio = subj.get_attributes_for_oid(oid("2.5.4.3"))[0].value.split(".")[1] # 2.5.4.3 is commonName
-    orgname = subj.get_attributes_for_oid(oid("2.5.4.10"))[0].value # 2.5.4.10 is organizationName
+    hpio = subj.get_attributes_for_oid(oid("2.5.4.3"))[0].value.split(".")[
+        1
+    ]  # 2.5.4.3 is commonName
+    orgname = subj.get_attributes_for_oid(oid("2.5.4.10"))[
+        0
+    ].value  # 2.5.4.10 is organizationName
     return hpio, orgname
 
 
@@ -68,7 +73,7 @@ def parse_asn1_time(time_bytes):
 
 class WsaAnonymisePlugin(zeep.plugins.Plugin):
     """Plugin to force the WS-Addressing To: header to the anonymous value
-    
+
     This is required in MHR messages per section 4.2 of the PCEHR Implementation guide
     and (apparently) ATS 5820-2010 section 2.
 
@@ -123,7 +128,8 @@ class MyHealthRecordInterface:
                 )
             except ValueError as e:
                 self.log.error(
-                    "Could not load certificate; check the supplied password (ValueError: %s).", e
+                    "Could not load certificate; check the supplied password (ValueError: %s).",
+                    e,
                 )
                 raise CertificateLoadException
 
@@ -171,7 +177,9 @@ class MyHealthRecordInterface:
             os.path.join(config["schema_path"], "wsdl/External/B2B_GetAuditView.wsdl"),
             transport=transport,
             wsse=wss_mhr,
-            plugins=[WsaAnonymisePlugin(),],
+            plugins=[
+                WsaAnonymisePlugin(),
+            ],
         )
         self.log.info("Creating service...")
         serv = self._getAuditView_client.create_service(

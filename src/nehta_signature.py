@@ -1,4 +1,5 @@
 """Functions for My Health Record-compatible signature creation and verification."""
+
 # My Health Record Organisational Audit Tool (Porridge) - My Health Record-compatible signature creation and verification
 
 # Copyright © 2020 David Adam <mail@davidadam.com.au>
@@ -78,7 +79,7 @@ class NehtaXMLSignature(object):
     """Sign given SOAP envelope with XML signature using given xmlsec.Key object
     as specified in the PCEHR View Service Technical Service Specification 1.7 and
     AS 5551-2015 (E-health XML secured payload profiles).
-    
+
     """
 
     def __init__(self, key):
@@ -186,8 +187,8 @@ def _verify_envelope_with_key(envelope, key):
 
 def ensure_id(node):
     """Ensure given node has an xml:id attribute; add unique one if not.
-        Return found/created attribute value.
-        """
+    Return found/created attribute value.
+    """
     assert node is not None
     id_val = node.get(ID_ATTR)
     if not id_val:
