@@ -27,8 +27,10 @@ import sys, os
 import xmlsec
 import zeep
 from nehta_signature import NehtaXMLSignature
-from requests.adapters import HTTPAdapter
-from OpenSSL.crypto import load_pkcs12
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.serialization import pkcs12
+import cryptography.x509
+from cryptography.x509 import ObjectIdentifier as oid
 from datetime import datetime, timezone
 from lxml import etree
 from config import mhr_config
@@ -36,16 +38,22 @@ from config import mhr_config
 target_ihi = open("secret/test-ihi.txt", "r").read().strip()
 pkcs12_bytes = open("secret/test-fac_sign.p12", "rb",).read()
 cert_password = open("secret/test-password.txt", "r").read().strip()
-pkcs_os = load_pkcs12(pkcs12_bytes, cert_password.encode("utf-8"))
+pkcs_cg = pkcs12.load_pkcs12(pkcs12_bytes, cert_password.encode("utf-8"))
 
-cert_os = pkcs_os.get_certificate()
-pkey_os = pkcs_os.get_privatekey()
-pkcs_os.set_ca_certificates(None)
+cert_cg = pkcs_cg.cert.certificate
 cert_xmlsec = xmlsec.Key.from_memory(
-    pkcs_os.export(passphrase=None), xmlsec.KeyFormat.PKCS12_PEM, password=None
+    pkcs12.serialize_key_and_certificates(
+        pkcs_cg.cert.friendly_name,
+        pkcs_cg.key,
+        pkcs_cg.cert.certificate,
+        None,
+        serialization.BestAvailableEncryption(b"porridge"),
+    ),
+    xmlsec.KeyFormat.PKCS12_PEM,
+    password="porridge",
 )
 
-hpio, orgname = mhr.hpio_from_certificate(cert_os)
+hpio, orgname = mhr.hpio_from_certificate(cert_cg)
 
 import urllib3
 from urllib3 import PoolManager
@@ -55,8 +63,8 @@ urllib3.contrib.pyopenssl.inject_into_urllib3()
 
 ctx = create_urllib3_context()
 ctx.set_default_verify_paths()
-ctx._ctx.use_certificate(cert_os)
-ctx._ctx.use_privatekey(pkey_os)
+ctx._ctx.use_certificate(cert_cg)
+ctx._ctx.use_privatekey(pkcs_cg.key)
 # Set up a requests session object that uses this context
 s = requests.sessions.Session()
 c = mhr.HTTPSAdapterWithContext(ssl_context=ctx)
