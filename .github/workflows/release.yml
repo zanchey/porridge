@@ -13,6 +13,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
@@ -24,16 +27,14 @@ jobs:
         if test ${{ matrix.os }} = macos-latest; then
           brew install libxmlsec1 pkg-config
         fi
-        python -m pip install --upgrade pip
-        python -m pip install pipenv
-        pipenv sync -d
+        uv sync --dev
 
     - name: Build
       env:
         SECRET_ZIP_PASS: ${{ secrets.SECRET_ZIP_PASS }}
         BUILD_TYPE: release
         BUILD_OS: ${{ matrix.os }}
-      run: pipenv run bash build.sh
+      run: uv run bash build.sh
 
     # Just upload as artifacts
     # The Releases action can't take wildcards and anyway it's worth adding the documentation
