@@ -36,7 +36,10 @@ from lxml import etree
 from config import mhr_config
 
 target_ihi = open("secret/test-ihi.txt", "r").read().strip()
-pkcs12_bytes = open("secret/test-fac_sign.p12", "rb",).read()
+pkcs12_bytes = open(
+    "secret/test-fac_sign.p12",
+    "rb",
+).read()
 cert_password = open("secret/test-password.txt", "r").read().strip()
 pkcs_cg = pkcs12.load_pkcs12(pkcs12_bytes, cert_password.encode("utf-8"))
 
@@ -108,7 +111,10 @@ headerdict = {
         "platform": sys.platform,
     },
     "clientSystemType": "CIS",
-    "accessingOrganisation": {"organisationID": hpio, "organisationName": orgname,},
+    "accessingOrganisation": {
+        "organisationID": hpio,
+        "organisationName": orgname,
+    },
 }
 
 header = PCEHRHeader(**headerdict)
@@ -118,7 +124,11 @@ PCEHRTimestamp = client.get_element(
 )
 timestamp = PCEHRTimestamp(created=datetime.now(timezone.utc))
 
-record = {"authorisationDetails": {"accessType": "EmergencyAccess",}}
+record = {
+    "authorisationDetails": {
+        "accessType": "EmergencyAccess",
+    }
+}
 
 for i in range(500):
     print(i)

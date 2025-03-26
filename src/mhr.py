@@ -134,11 +134,13 @@ class MyHealthRecordInterface:
         # This serialization uses a static encryption key, as using no encryption fails with
         # xmlsec.Error: (1, 'cannot load key')
         cert_xmlsec = xmlsec.Key.from_memory(
-            pkcs12.serialize_key_and_certificates(pkcs_cg.cert.friendly_name,
-                                                  pkcs_cg.key,
-                                                  pkcs_cg.cert.certificate,
-                                                  None,
-                                                  serialization.BestAvailableEncryption(b"porridge")),
+            pkcs12.serialize_key_and_certificates(
+                pkcs_cg.cert.friendly_name,
+                pkcs_cg.key,
+                pkcs_cg.cert.certificate,
+                None,
+                serialization.BestAvailableEncryption(b"porridge"),
+            ),
             xmlsec.KeyFormat.PKCS12_PEM,
             password="porridge",
         )
