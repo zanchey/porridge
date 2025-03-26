@@ -130,14 +130,17 @@ class MyHealthRecordInterface:
                 raise CertificateLoadException
 
         cert_cg = pkcs_cg.cert.certificate
+
+        # This serialization uses a static encryption key, as using no encryption fails with
+        # xmlsec.Error: (1, 'cannot load key')
         cert_xmlsec = xmlsec.Key.from_memory(
-            pkcs_cg.key.private_bytes(
-                serialization.Encoding.PEM,
-                serialization.PrivateFormat.PKCS8,
-                serialization.NoEncryption(),
-            ),
-            xmlsec.KeyFormat.PKCS8_PEM,
-            password=None,
+            pkcs12.serialize_key_and_certificates(pkcs_cg.cert.friendly_name,
+                                                  pkcs_cg.key,
+                                                  pkcs_cg.cert.certificate,
+                                                  None,
+                                                  serialization.BestAvailableEncryption(b"porridge")),
+            xmlsec.KeyFormat.PKCS12_PEM,
+            password="porridge",
         )
 
         self.hpio, self.orgname = hpio_from_certificate(cert_cg)
