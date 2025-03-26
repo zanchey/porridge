@@ -67,10 +67,6 @@ def hpio_from_certificate(certificate):
     return hpio, orgname
 
 
-def parse_asn1_time(time_bytes):
-    return datetime.strptime(time_bytes.decode(), "%Y%m%d%H%M%SZ")
-
-
 class WsaAnonymisePlugin(zeep.plugins.Plugin):
     """Plugin to force the WS-Addressing To: header to the anonymous value
 
