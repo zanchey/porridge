@@ -27,6 +27,10 @@ import xmlsec
 from nehta_signature import NehtaXMLSignature
 from datetime import datetime, timezone
 import logging
+from sys import platform
+if platform == "win32":
+    from ssl import enum_certificates
+import OpenSSL.crypto
 
 # Required to make urllib use PyOpenSSL, which supports PKCS#12 handling
 urllib3.contrib.pyopenssl.inject_into_urllib3()
@@ -65,6 +69,34 @@ def hpio_from_certificate(certificate):
         0
     ].value  # 2.5.4.10 is organizationName
     return hpio, orgname
+
+
+def setup_certificate_verification(context, logger):
+    """Add default verification paths, and on Windows, the system CA stores to a pyOpenSSL context"""
+    context.set_default_verify_paths()
+    if platform == "win32":
+        # The standard library ssl module does this on Windows, but PyOpenSSL does not (yet)
+        store = context.get_cert_store()
+        # "ROOT" is the "Trusted Root Certification Authorities", "CA" is the "Intermediate Certification Authorities"
+        # The Python SSL module loads both, so do the same
+        for store_name in ("ROOT", "CA"):
+            for cert_bytes, encoding_type, trust in enum_certificates(store_name):
+                if encoding_type == "x509_asn":
+                    # Must be trusted for all purposes (True) or for server authentication
+                    if trust == True or "1.3.6.1.5.5.7.3.1" in trust:
+                        try:
+                            # Load as an OpenSSL X509 object rather than a cryptography object which is then converted to OpenSSL.X509
+                            store.add_cert(
+                                OpenSSL.crypto.load_certificate(
+                                    OpenSSL.crypto.FILETYPE_ASN1, cert_bytes
+                                )
+                            )
+                        except OpenSSL.crypto.Error as e:
+                            logger.warn("Unable to load system certificate: {e!s}")
+                else:
+                    logger.warn(
+                        "Unrecognised certificate type ({type}) when importing from system certificate store."
+                    )
 
 
 class WsaAnonymisePlugin(zeep.plugins.Plugin):
@@ -157,7 +189,7 @@ class MyHealthRecordInterface:
         # The standard library's ssl module does not support loading from memory; the only real
         # justification is that this is less secure - see https://github.com/python/cpython/issues/129216
         ctx = create_urllib3_context()
-        ctx.set_default_verify_paths()
+        setup_certificate_verification(ctx._ctx, self.log)
         ctx._ctx.use_certificate(cert_cg)
         ctx._ctx.use_privatekey(pkcs_cg.key)
 
